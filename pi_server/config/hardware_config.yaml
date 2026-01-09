@@ -1,0 +1,61 @@
+# Qt Robot Controller - Hardware Configuration
+# This file is automatically updated when you change settings in the PC app
+
+# Server Settings
+server_port: 8888
+
+# Motor Configuration
+motors:
+  pin_mode: "BOARD"  # GPIO numbering: "BOARD" or "BCM"
+  pins:
+    L1: 33  # Left motor forward (GPIO pin number)
+    L2: 38  # Left motor backward
+    R1: 35  # Right motor forward
+    R2: 40  # Right motor backward
+  pwm_frequency: 100  # PWM frequency in Hz
+  default_speed: 70   # Default speed (0-100%)
+  turn_speed: 50      # Speed for turning (0-100%)
+
+# Camera Configuration
+camera:
+  enabled: true
+  type: "opencv"  # "opencv" or "picamera2"
+  device_id: 0    # Camera device ID (for USB cameras)
+  width: 640
+  height: 480
+  fps: 30
+  stream_quality: 80  # JPEG quality (0-100)
+
+# LiDAR Configuration
+lidar:
+  enabled: false
+  port: "/dev/ttyUSB0"
+  baudrate: 115200
+  scan_mode: "standard"
+
+# Ultrasonic Sensor Configuration
+ultrasonic:
+  enabled: true
+  trigger_pin: 11  # GPIO BOARD numbering
+  echo_pin: 13
+  max_distance: 400  # cm
+  obstacle_threshold: 30  # cm (stop distance)
+
+# Display Configuration (for face animation on LCD/OLED)
+display:
+  enabled: false
+  type: "oled"  # "oled" or "lcd"
+  width: 128
+  height: 64
+
+# Safety Configuration
+safety:
+  auto_stop_timeout: 10  # seconds (motors auto-stop if no command)
+  obstacle_detection: true
+  watchdog_enabled: true
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_to_file: true
+  log_file: "logs/robot.log"
