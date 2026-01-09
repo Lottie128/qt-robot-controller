@@ -21,7 +21,32 @@ A modern, practical distributed robot control system with **Qt desktop applicati
 - ✅ **Configurable GPIO** - Change pin mappings in software
 - ✅ **Works Anywhere** - Automatically adapts to any network
 
-## ⚡ Quick Start (3 Steps!)
+## ⚡ Quick Start
+
+### 🍎 macOS Users - Start Here!
+
+For the best experience on macOS, use our automated installer:
+
+```bash
+# Clone and install in one go
+git clone https://github.com/Lottie128/qt-robot-controller.git
+cd qt-robot-controller
+chmod +x scripts/macos_install.sh
+./scripts/macos_install.sh
+```
+
+**What it does:**
+- ✅ Auto-detects Apple Silicon (M1/M2/M3) or Intel Mac
+- ✅ Installs Homebrew if needed
+- ✅ Installs PortAudio for microphone support
+- ✅ Fixes Python 3.9 compatibility issues
+- ✅ Handles zsh shell quoting correctly
+- ✅ Configures audio with proper compiler flags
+- ✅ Tests everything automatically
+
+**📖 Full macOS Guide:** See [docs/MACOS_SETUP.md](docs/MACOS_SETUP.md) for detailed instructions and troubleshooting.
+
+---
 
 ### Step 1: Setup Raspberry Pi (5 minutes)
 
@@ -47,37 +72,36 @@ python3 server.py
 
 ### Step 2: Setup PC Application
 
-#### macOS Quick Install 🍎
+#### 🍎 macOS (Automated)
 
 ```bash
-# Clone repository
 git clone https://github.com/Lottie128/qt-robot-controller.git
 cd qt-robot-controller
-
-# Run macOS installer (handles everything!)
-chmod +x scripts/macos_install.sh
 ./scripts/macos_install.sh
+
+# Then run:
+cd pc_app
+source venv/bin/activate
+python main.py
 ```
 
-The script will:
-- Check Homebrew (install if needed)
-- Install PortAudio for voice support
-- Setup virtual environment
-- Install all Python dependencies
-- Configure audio permissions
+👉 **Having issues?** Check [docs/MACOS_SETUP.md](docs/MACOS_SETUP.md)
 
-#### Linux/Windows Install
+#### 🐧 Linux
 
 ```bash
-# Clone repository
 git clone https://github.com/Lottie128/qt-robot-controller.git
-cd qt-robot-controller/pc_app
+cd qt-robot-controller
+./scripts/install_pc.sh
+```
 
-# Install dependencies
+#### 🪟 Windows
+
+```bash
+git clone https://github.com/Lottie128/qt-robot-controller.git
+cd qt-robot-controller\pc_app
 pip install -r requirements.txt
-
-# Run application
-python3 main.py
+python main.py
 ```
 
 ### Step 3: Connect & Control!
@@ -86,56 +110,43 @@ python3 main.py
 2. **Click Connect** - Establishes secure connection
 3. **Start Controlling** - Use voice, keyboard, or GUI buttons!
 
+## 📖 Documentation
+
+### Platform-Specific Guides
+- **[🍎 macOS Setup Guide](docs/MACOS_SETUP.md)** - Complete macOS installation and troubleshooting
+- **General Setup Guide** - [docs/SETUP_GUIDE.md](docs/SETUP_GUIDE.md)
+- **GPIO Configuration** - [docs/GPIO_CONFIGURATION.md](docs/GPIO_CONFIGURATION.md)
+- **Network Guide** - [docs/NETWORK_GUIDE.md](docs/NETWORK_GUIDE.md)
+- **Troubleshooting** - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+
 ## 📁 Project Structure
 
 ```
 qt-robot-controller/
 ├── pc_app/                    # Qt Desktop Application (PC)
 │   ├── main.py               # Application entry point
-│   ├── ui/
-│   │   ├── main_window.py    # Main Qt window
-│   │   ├── login_dialog.py   # Connection dialog
-│   │   ├── settings_dialog.py # GPIO & settings configuration
-│   │   └── resources/        # UI assets, icons, themes
-│   ├── modules/
-│   │   ├── network_client.py # Socket client for Pi communication
-│   │   ├── ai_brain.py       # Google Gemini integration
-│   │   ├── voice_input.py    # Speech recognition
-│   │   ├── tts_engine.py     # Text-to-speech
-│   │   ├── face_animator.py  # Face animation engine
-│   │   └── vision_processor.py
-│   ├── config/
-│   │   └── app_config.yaml   # Application configuration
-│   └── requirements.txt
+│   ├── ui/                   # User interface components
+│   ├── modules/              # Core functionality modules
+│   ├── config/               # Configuration files
+│   └── requirements.txt      # Python dependencies
 │
-├── pi_server/                 # Raspberry Pi Server Script
-│   ├── server.py             # Main server script (simple!)
-│   ├── hardware/
-│   │   ├── motor_controller.py
-│   │   ├── camera_module.py
-│   │   ├── lidar_module.py
-│   │   └── sensors.py
-│   ├── display/
-│   │   └── face_display.py   # LCD/screen face display
-│   ├── config/
-│   │   └── hardware_config.yaml
-│   └── requirements.txt
-│
-├── shared/                    # Shared utilities
-│   ├── protocol.py           # Communication protocol
-│   └── constants.py          # Shared constants
+├── pi_server/                 # Raspberry Pi Server
+│   ├── server.py             # Main server script
+│   ├── hardware/             # Hardware control modules
+│   ├── display/              # Display management
+│   └── config/               # Hardware configuration
 │
 ├── docs/                      # Documentation
+│   ├── MACOS_SETUP.md        # 🍎 macOS-specific guide
 │   ├── SETUP_GUIDE.md
 │   ├── GPIO_CONFIGURATION.md
-│   ├── NETWORK_GUIDE.md
 │   └── TROUBLESHOOTING.md
 │
-├── scripts/                   # Utility scripts
-│   ├── install_pc.sh         # PC setup script (auto-detects OS)
-│   ├── macos_install.sh      # macOS-optimized installer
-│   ├── install_pi.sh         # Pi setup script
-│   └── test_connection.py    # Test network connection
+├── scripts/                   # Installation & utility scripts
+│   ├── macos_install.sh      # 🍎 macOS one-click installer
+│   ├── install_pc.sh         # Cross-platform installer
+│   ├── install_pi.sh         # Raspberry Pi installer
+│   └── test_connection.py    # Network test utility
 │
 └── README.md
 ```
@@ -191,41 +202,13 @@ LiDAR:
 4. Click **Save & Apply**
 5. Changes sync automatically to Pi
 
-## 🔌 Network Communication
-
-### How It Works
-
-1. **Pi Server Starts** → Binds to all interfaces (`0.0.0.0:8888`)
-2. **Auto-detects IP** → Shows local IP on terminal
-3. **PC Connects** → User enters IP in Qt app login
-4. **WebSocket Established** → Fast bidirectional communication
-5. **Commands Flow** → PC sends, Pi executes, responds
-
-### Protocol
-
-```python
-# Command Structure (JSON over WebSocket)
-{
-    "type": "command",
-    "action": "move_forward",
-    "params": {"speed": 70, "duration": 2.0}
-}
-
-# Response Structure
-{
-    "type": "response",
-    "status": "success",
-    "data": {"distance_traveled": 1.5}
-}
-```
-
 ## 📝 Requirements
 
 ### PC Requirements
 - **OS:** Windows 10/11, macOS 10.15+, or Linux
 - **Python:** 3.9+
 - **RAM:** 4GB minimum, 8GB recommended
-- **GPU:** Optional (for AI acceleration)
+- **Microphone:** For voice control (optional)
 
 ### Raspberry Pi Requirements
 - **Model:** Raspberry Pi 3/4/5
@@ -233,90 +216,6 @@ LiDAR:
 - **Python:** 3.9+
 - **Camera:** CSI or USB camera
 - **Accessories:** L298N motor driver, motors, power supply
-
-## 🚀 Detailed Setup
-
-### macOS Installation (Recommended Method)
-
-```bash
-# 1. Clone repository
-git clone https://github.com/Lottie128/qt-robot-controller.git
-cd qt-robot-controller
-
-# 2. Run installer
-chmod +x scripts/macos_install.sh
-./scripts/macos_install.sh
-
-# 3. Activate environment and run
-cd pc_app
-source venv/bin/activate
-python main.py
-```
-
-**What the installer does:**
-- ✅ Detects Apple Silicon or Intel Mac
-- ✅ Checks/installs Homebrew
-- ✅ Installs PortAudio (for microphone support)
-- ✅ Creates virtual environment
-- ✅ Installs Python dependencies (handles Python 3.9 compatibility)
-- ✅ Configures audio with proper compiler flags
-- ✅ Sets up configuration files
-
-### Manual PC Installation
-
-```bash
-# Clone repository
-git clone https://github.com/Lottie128/qt-robot-controller.git
-cd qt-robot-controller/pc_app
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install --upgrade pip
-pip install -r requirements.txt
-
-# Configure API keys (optional for AI features)
-cp config/.env.example config/.env
-nano config/.env  # Add GEMINI_API_KEY
-
-# Run application
-python3 main.py
-```
-
-### Raspberry Pi Installation
-
-```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
-
-# Install system dependencies
-sudo apt install -y python3-pip python3-opencv python3-pyaudio
-sudo apt install -y libatlas-base-dev libhdf5-dev libjpeg-dev
-
-# Clone repository
-git clone https://github.com/Lottie128/qt-robot-controller.git
-cd qt-robot-controller/pi_server
-
-# Install Python packages
-pip install -r requirements.txt
-
-# Enable camera (if using CSI)
-sudo raspi-config
-# Navigate to: Interface Options → Camera → Enable
-
-# Setup GPIO permissions
-sudo usermod -a -G gpio $USER
-sudo usermod -a -G i2c $USER
-
-# Reboot
-sudo reboot
-
-# After reboot, run server
-cd qt-robot-controller/pi_server
-python3 server.py
-```
 
 ## 🎮 Usage
 
@@ -332,217 +231,140 @@ Output:
 ```
 🤖 Qt Robot Server v1.0
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📡 Network Interfaces:
-   • eth0: 192.168.1.105
-   • wlan0: 192.168.1.106
-
-🔌 Server running on 0.0.0.0:8888
+📡 Server IP: 192.168.1.105:8888
 ⚡ Waiting for PC connection...
 ```
 
 **2. Launch Qt App (PC)**
 ```bash
 cd pc_app
-source venv/bin/activate  # If using venv
-python3 main.py
+source venv/bin/activate  # macOS/Linux
+python main.py
 ```
 
-**3. Connect**
-- Enter IP: `192.168.1.105` (from Pi terminal)
-- Port: `8888` (default)
-- Click **Connect**
+**3. Connect & Control**
+- Enter IP from Pi terminal
+- Click Connect
+- Use voice, keyboard, or GUI controls
 
-**4. Control Your Robot!**
-- **Voice:** Click mic button, speak "Move forward"
-- **Keyboard:** Arrow keys for movement
-- **GUI:** Click direction buttons
+## 🐛 Common Issues
 
-### Configuration Changes
+### macOS Issues
 
-**Change GPIO Pins:**
-1. PC App → **Settings** → **Hardware Configuration**
-2. Modify pin numbers
-3. Click **Apply**
-4. Pi automatically updates without restart!
-
-**Change Network Port:**
-- Edit `pi_server/config/hardware_config.yaml`
-- Change `server_port: 8888` to desired port
-- Restart Pi server
-
-## 🐛 Troubleshooting
-
-### macOS-Specific Issues
-
-#### PyAudio Won't Install
-
+**PyAudio won't install?**
 ```bash
-# Install Homebrew if not present
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# For Apple Silicon (M1/M2/M3)
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# For Intel Mac
-eval "$(/usr/local/bin/brew shellenv)"
-
-# Install PortAudio
 brew install portaudio
-
-# Install PyAudio with proper flags
 CFLAGS="-I$(brew --prefix portaudio)/include" \
 LDFLAGS="-L$(brew --prefix portaudio)/lib" \
-pip install --no-cache-dir pyaudio
+pip install pyaudio
 ```
 
-#### Microphone Permission Error
-
-1. Go to **System Preferences** → **Security & Privacy** → **Privacy**
-2. Select **Microphone** from left sidebar
-3. Enable access for:
-   - Terminal (if running from terminal)
-   - Python (if it appears)
-   - Your Qt app
-
-#### zsh: no matches found error
-
+**zsh bracket errors?**
 ```bash
-# When installing packages with brackets, use quotes:
-pip install "python-socketio[client]"  # ✅ Correct
-pip install python-socketio[client]     # ❌ Wrong in zsh
+# Use quotes:
+pip install "python-socketio[client]"
 ```
 
-### Pi Server Won't Start
+**Microphone permission?**
+- System Preferences → Security & Privacy → Microphone
+- Enable Terminal/Python
+
+**📖 Full troubleshooting:** [docs/MACOS_SETUP.md](docs/MACOS_SETUP.md)
+
+### Pi/PC Connection Issues
 
 ```bash
-# Check port availability
-sudo netstat -tulpn | grep 8888
+# Test connection
+ping <pi-ip>
+telnet <pi-ip> 8888
 
-# If port in use, kill process
-sudo kill -9 <PID>
-
-# Or change port in hardware_config.yaml
-```
-
-### PC Can't Connect
-
-```bash
-# Test connectivity from PC
-ping 192.168.1.105  # Use your Pi IP
-
-# Test port
-telnet 192.168.1.105 8888
-
-# Check firewall on Pi
-sudo ufw status
+# Check firewall
 sudo ufw allow 8888/tcp
 ```
 
-### "RPi.GPIO Not Found" on Pi
+## 🔒 Security Notes
 
-```bash
-# Install GPIO library
-pip install RPi.GPIO
+**Current Setup (Home/Lab):**
+- Local network only
+- No authentication
+- Simple, fast communication
 
-# If permission error
-sudo usermod -a -G gpio $USER
-logout  # Then login again
-```
-
-### Qt App Shows "Module Not Found"
-
-```bash
-# Reinstall Qt dependencies
-pip install PyQt6 PyQt6-WebEngine --upgrade
-
-# On Ubuntu, may need system packages
-sudo apt install python3-pyqt6 python3-pyqt6.qtwebengine
-```
-
-### Motors Not Responding
-
-1. **Check Wiring** - Verify GPIO connections
-2. **Check Pin Config** - Settings → Hardware → Verify pins
-3. **Check Power** - Motor driver needs external power (not Pi)
-4. **Test Manual** - Use PC app test panel
-5. **Check Permissions**:
-   ```bash
-   sudo usermod -a -G gpio $USER
-   ```
-
-### Camera Not Working
-
-```bash
-# List video devices
-ls -l /dev/video*
-
-# Test camera
-raspistill -o test.jpg  # CSI camera
-vcgencmd get_camera     # Check if detected
-
-# For USB camera
-v4l2-ctl --list-devices
-```
-
-## 🔒 Security Considerations
-
-### For Home/Lab Use (Current Setup)
-- ✅ Local network only
-- ✅ No authentication (trusted network)
-- ✅ Simple, fast communication
-
-### For Public/Production Use (Recommended Changes)
-
-```python
-# Add authentication token
-CONNECTION_TOKEN = "your_secret_token_here"
-
-# Use SSL/TLS
-import ssl
-context = ssl.create_default_context()
-
-# Implement user authentication
-# Rate limiting
-# Encrypted communication
-```
+**For Production:** Add authentication, SSL/TLS, rate limiting
 
 ## 🤝 Contributing
 
-Contributions welcome! Please:
+Contributions welcome!
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create feature branch (`git checkout -b feature/name`)
+3. Commit changes
+4. Push and open Pull Request
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE)
 
 ## 🙏 Acknowledgments
 
 - Inspired by [vivan129/distributed-robot-system](https://github.com/vivan129/distributed-robot-system)
-- Built with Qt6 and Python
+- Built with Qt6, Python, and Raspberry Pi
 - Google Gemini AI integration
-- Raspberry Pi community
 
-## 📚 Additional Resources
+## 🔗 Resources
 
-- [Qt for Python Documentation](https://doc.qt.io/qtforpython/)
-- [Raspberry Pi GPIO Guide](https://pinout.xyz/)
+### Documentation
+- **[🍎 macOS Setup](docs/MACOS_SETUP.md)** - Complete macOS guide
+- [Setup Guide](docs/SETUP_GUIDE.md)
+- [GPIO Configuration](docs/GPIO_CONFIGURATION.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+
+### External Links
+- [Qt for Python](https://doc.qt.io/qtforpython/)
+- [Raspberry Pi GPIO](https://pinout.xyz/)
 - [Google Gemini API](https://ai.google.dev/)
-- [WebSocket Protocol](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
-- [Homebrew Documentation](https://docs.brew.sh/)
+- [Homebrew](https://docs.brew.sh/)
 
-## 🔗 Links
-
-- **GitHub:** [https://github.com/Lottie128/qt-robot-controller](https://github.com/Lottie128/qt-robot-controller)
-- **Issues:** [Report bugs or request features](https://github.com/Lottie128/qt-robot-controller/issues)
-- **Discussions:** [Ask questions and share ideas](https://github.com/Lottie128/qt-robot-controller/discussions)
+### Project Links
+- **GitHub:** [Lottie128/qt-robot-controller](https://github.com/Lottie128/qt-robot-controller)
+- **Issues:** [Report bugs](https://github.com/Lottie128/qt-robot-controller/issues)
+- **Discussions:** [Get help](https://github.com/Lottie128/qt-robot-controller/discussions)
 
 ---
 
 **Made with ❤️ by robotics enthusiasts**
 
-⭐ If this project helps you, please give it a star!
+⭐ **If this project helps you, please star it!**
+
+---
+
+## 🚨 Quick Command Reference
+
+### macOS
+```bash
+# Install
+git clone https://github.com/Lottie128/qt-robot-controller.git
+cd qt-robot-controller && ./scripts/macos_install.sh
+
+# Run
+cd pc_app && source venv/bin/activate && python main.py
+```
+
+### Raspberry Pi
+```bash
+# Setup
+git clone https://github.com/Lottie128/qt-robot-controller.git
+cd qt-robot-controller/pi_server && pip install -r requirements.txt
+
+# Run
+python3 server.py
+```
+
+### Testing
+```bash
+# Test connection from PC
+ping <pi-ip>
+python scripts/test_connection.py <pi-ip>
+
+# Test imports
+python -c "import PyQt6, websockets, pyaudio; print('OK')"
+```
