@@ -45,17 +45,38 @@ python3 server.py
 ⚡ Waiting for connection...
 ```
 
-### Step 2: Setup PC Application (5 minutes)
+### Step 2: Setup PC Application
+
+#### macOS Quick Install 🍎
 
 ```bash
-# Clone repository on PC
+# Clone repository
+git clone https://github.com/Lottie128/qt-robot-controller.git
+cd qt-robot-controller
+
+# Run macOS installer (handles everything!)
+chmod +x scripts/macos_install.sh
+./scripts/macos_install.sh
+```
+
+The script will:
+- Check Homebrew (install if needed)
+- Install PortAudio for voice support
+- Setup virtual environment
+- Install all Python dependencies
+- Configure audio permissions
+
+#### Linux/Windows Install
+
+```bash
+# Clone repository
 git clone https://github.com/Lottie128/qt-robot-controller.git
 cd qt-robot-controller/pc_app
 
-# Install Qt dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# Run the Qt application
+# Run application
 python3 main.py
 ```
 
@@ -111,7 +132,8 @@ qt-robot-controller/
 │   └── TROUBLESHOOTING.md
 │
 ├── scripts/                   # Utility scripts
-│   ├── install_pc.sh         # PC setup script
+│   ├── install_pc.sh         # PC setup script (auto-detects OS)
+│   ├── macos_install.sh      # macOS-optimized installer
 │   ├── install_pi.sh         # Pi setup script
 │   └── test_connection.py    # Test network connection
 │
@@ -214,7 +236,33 @@ LiDAR:
 
 ## 🚀 Detailed Setup
 
-### PC Installation
+### macOS Installation (Recommended Method)
+
+```bash
+# 1. Clone repository
+git clone https://github.com/Lottie128/qt-robot-controller.git
+cd qt-robot-controller
+
+# 2. Run installer
+chmod +x scripts/macos_install.sh
+./scripts/macos_install.sh
+
+# 3. Activate environment and run
+cd pc_app
+source venv/bin/activate
+python main.py
+```
+
+**What the installer does:**
+- ✅ Detects Apple Silicon or Intel Mac
+- ✅ Checks/installs Homebrew
+- ✅ Installs PortAudio (for microphone support)
+- ✅ Creates virtual environment
+- ✅ Installs Python dependencies (handles Python 3.9 compatibility)
+- ✅ Configures audio with proper compiler flags
+- ✅ Sets up configuration files
+
+### Manual PC Installation
 
 ```bash
 # Clone repository
@@ -283,7 +331,7 @@ python3 server.py
 Output:
 ```
 🤖 Qt Robot Server v1.0
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📡 Network Interfaces:
    • eth0: 192.168.1.105
    • wlan0: 192.168.1.106
@@ -295,6 +343,7 @@ Output:
 **2. Launch Qt App (PC)**
 ```bash
 cd pc_app
+source venv/bin/activate  # If using venv
 python3 main.py
 ```
 
@@ -322,6 +371,46 @@ python3 main.py
 - Restart Pi server
 
 ## 🐛 Troubleshooting
+
+### macOS-Specific Issues
+
+#### PyAudio Won't Install
+
+```bash
+# Install Homebrew if not present
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# For Apple Silicon (M1/M2/M3)
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# For Intel Mac
+eval "$(/usr/local/bin/brew shellenv)"
+
+# Install PortAudio
+brew install portaudio
+
+# Install PyAudio with proper flags
+CFLAGS="-I$(brew --prefix portaudio)/include" \
+LDFLAGS="-L$(brew --prefix portaudio)/lib" \
+pip install --no-cache-dir pyaudio
+```
+
+#### Microphone Permission Error
+
+1. Go to **System Preferences** → **Security & Privacy** → **Privacy**
+2. Select **Microphone** from left sidebar
+3. Enable access for:
+   - Terminal (if running from terminal)
+   - Python (if it appears)
+   - Your Qt app
+
+#### zsh: no matches found error
+
+```bash
+# When installing packages with brackets, use quotes:
+pip install "python-socketio[client]"  # ✅ Correct
+pip install python-socketio[client]     # ❌ Wrong in zsh
+```
 
 ### Pi Server Won't Start
 
@@ -444,6 +533,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - [Raspberry Pi GPIO Guide](https://pinout.xyz/)
 - [Google Gemini API](https://ai.google.dev/)
 - [WebSocket Protocol](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+- [Homebrew Documentation](https://docs.brew.sh/)
 
 ## 🔗 Links
 
