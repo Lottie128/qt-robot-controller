@@ -1,0 +1,40 @@
+"""Shared constants for Qt Robot Controller."""
+
+# Version
+VERSION = "1.0.0"
+APP_NAME = "Qt Robot Controller"
+
+# Network
+DEFAULT_SERVER_PORT = 8888
+MAX_MESSAGE_SIZE = 1024 * 1024  # 1 MB
+RECONNECT_DELAY = 5  # seconds
+MAX_RECONNECT_ATTEMPTS = 5
+
+# Motor Control
+MOTOR_SPEED_MIN = 0
+MOTOR_SPEED_MAX = 100
+MOTOR_DEFAULT_SPEED = 70
+MOTOR_TURN_SPEED = 50
+MOTOR_STOP_TIMEOUT = 10  # Auto-stop after N seconds
+
+# Camera
+CAMERA_WIDTH = 640
+CAMERA_HEIGHT = 480
+CAMERA_FPS = 30
+STREAM_QUALITY = 80  # JPEG quality
+
+# Sensors
+ULTRASONIC_MAX_DISTANCE = 400  # cm
+ULTRASONIC_OBSTACLE_THRESHOLD = 30  # cm
+LIDAR_MAX_DISTANCE = 12.0  # meters
+LIDAR_MIN_DISTANCE = 0.15  # meters
+
+# UI
+WINDOW_MIN_WIDTH = 1024
+WINDOW_MIN_HEIGHT = 768
+FACE_ANIMATION_FPS = 60
+
+# File Paths
+LOG_DIR = "logs"
+CONFIG_DIR = "config"
+RESOURCES_DIR = "resources"
