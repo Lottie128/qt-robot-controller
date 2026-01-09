@@ -4,101 +4,48 @@
 app:
   name: "Qt Robot Controller"
   version: "1.0.0"
-  organization: "ZeroAI Tech"
   theme: "dark"  # dark or light
-  language: "en"
 
 # Connection Settings
 connection:
   default_port: 8888
   timeout: 10  # seconds
   reconnect_attempts: 3
-  reconnect_delay: 5  # seconds
   auto_reconnect: true
-  remember_last_connection: true
+
+# UI Settings
+ui:
+  update_rate: 30  # Hz
+  window_width: 1200
+  window_height: 800
+  enable_keyboard_control: true
 
 # Video Settings
 video:
   display_width: 640
   display_height: 480
   auto_start: false
-  show_fps: true
-  apply_filters: false
-  face_detection: false
 
-# Control Settings
-control:
-  keyboard_enabled: true
-  default_speed: 70  # 0-100
-  turn_speed: 50
-  speed_increment: 10
-  
-  # Keyboard bindings
-  keys:
-    forward: "Up"
-    backward: "Down"
-    left: "Left"
-    right: "Right"
-    stop: "Space"
-    speed_up: "Plus"
-    speed_down: "Minus"
-
-# Voice Settings
-voice:
-  enabled: true
-  auto_listen: false
-  timeout: 5  # seconds
-  phrase_time_limit: 10
-  confirmation_sound: true
-
-# AI Settings
+# Voice/AI Settings
 ai:
   enabled: true
-  model: "gemini-1.5-flash"
-  max_history: 50
-  context_awareness: true
+  provider: "gemini"  # gemini or fallback
+  timeout: 10  # seconds
 
-# TTS Settings
+voice:
+  enabled: true
+  continuous_mode: false
+  language: "en-US"
+  timeout: 5  # seconds
+
 tts:
   enabled: true
   rate: 150  # words per minute
   volume: 0.9  # 0.0 to 1.0
-  voice: "default"
-  auto_speak_responses: false
-
-# UI Settings
-ui:
-  window_width: 1200
-  window_height: 800
-  start_maximized: false
-  show_status_bar: true
-  show_sidebar: true
-  console_max_lines: 1000
-  
-  # Panel visibility
-  panels:
-    video: true
-    controls: true
-    chat: true
-    sensors: true
-    map: false
 
 # Logging Settings
 logging:
   level: "INFO"  # DEBUG, INFO, WARNING, ERROR
   log_to_file: true
-  log_file: "logs/pc_app.log"
+  log_file: "logs/app.log"
   console_output: true
-
-# Data Recording
-recording:
-  auto_record: false
-  save_video: false
-  save_sensor_data: true
-  output_directory: "recordings"
-
-# Advanced Settings
-advanced:
-  developer_mode: false
-  show_network_stats: false
-  debug_mode: false

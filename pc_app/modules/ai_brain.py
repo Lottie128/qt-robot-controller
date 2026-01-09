@@ -1,184 +1,125 @@
-"""AI Brain module using Google Gemini API.
+"""AI brain using Google Gemini for natural language processing.
 
-Handles natural language processing and intelligent responses.
+Processes voice commands and generates robot actions.
 """
 
 import os
 import logging
-from typing import Optional, List, Dict
-import json
+from typing import Dict, Optional
 
 try:
     import google.generativeai as genai
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
-    print("⚠️  google-generativeai not available - install with: pip install google-generativeai")
 
 
 class AIBrain:
-    """AI brain for robot using Google Gemini."""
+    """AI command processor using Gemini."""
     
     def __init__(self, api_key: Optional[str] = None):
         """Initialize AI brain.
         
         Args:
-            api_key: Google Gemini API key (or use GEMINI_API_KEY env var)
+            api_key: Google Gemini API key (or from env)
         """
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        self.model = None
-        self.chat = None
-        self.conversation_history: List[Dict] = []
         self.logger = logging.getLogger(__name__)
+        self.model = None
         
-        if GEMINI_AVAILABLE and self.api_key:
-            self._init_gemini()
-        elif not GEMINI_AVAILABLE:
-            self.logger.warning("Gemini API not available")
+        # Get API key
+        api_key = api_key or os.getenv("GEMINI_API_KEY")
+        
+        if GEMINI_AVAILABLE and api_key:
+            try:
+                genai.configure(api_key=api_key)
+                self.model = genai.GenerativeModel('gemini-pro')
+                self.logger.info("✅ Gemini AI initialized")
+            except Exception as e:
+                self.logger.warning(f"⚠️  Gemini init failed: {e}")
         else:
-            self.logger.warning("No API key provided - AI features disabled")
-    
-    def _init_gemini(self):
-        """Initialize Gemini API."""
-        try:
-            genai.configure(api_key=self.api_key)
-            
-            # Use Gemini 1.5 Flash for fast responses
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
-            
-            # Start chat with robot context
-            system_prompt = (
-                "You are an AI assistant for a robot controller. "
-                "You help users control their robot through natural language commands. "
-                "Parse commands like 'move forward', 'turn left', 'stop', etc. "
-                "Be concise and helpful. When you understand a command, "
-                "respond with the action to take."
-            )
-            
-            self.chat = self.model.start_chat(history=[])
-            self.logger.info("✅ Gemini AI initialized")
-        
-        except Exception as e:
-            self.logger.error(f"Failed to initialize Gemini: {e}")
-            self.model = None
+            self.logger.warning("⚠️  Gemini not available")
     
     def is_available(self) -> bool:
         """Check if AI is available."""
         return self.model is not None
     
-    async def process_command(self, user_input: str) -> Dict[str, any]:
+    async def process_command(self, text: str) -> Dict:
         """Process natural language command.
         
         Args:
-            user_input: User's voice or text input
+            text: Command text
             
         Returns:
-            Dictionary with action and parameters
+            Dictionary with response and action
         """
         if not self.is_available():
-            return {
-                "error": "AI not available",
-                "response": "AI features are not enabled"
-            }
+            return self._fallback_process(text)
         
         try:
-            # Add command parsing instruction
-            prompt = (
-                f"User command: '{user_input}'\n\n"
-                "Parse this command and respond with JSON in this format:\n"
-                "{\n"
-                '  "action": "move_forward|move_backward|turn_left|turn_right|stop|unknown",\n'
-                '  "speed": 70,  // optional, 0-100\n'
-                '  "duration": 2.0,  // optional, seconds\n'
-                '  "response": "Human-friendly response"\n'
-                "}"
-            )
+            # Create prompt
+            prompt = self._create_prompt(text)
             
-            response = self.chat.send_message(prompt)
-            response_text = response.text
+            # Generate response
+            response = await self.model.generate_content_async(prompt)
             
-            # Try to extract JSON
-            try:
-                # Remove markdown code blocks if present
-                if "```json" in response_text:
-                    response_text = response_text.split("```json")[1].split("```")[0]
-                elif "```" in response_text:
-                    response_text = response_text.split("```")[1].split("```")[0]
-                
-                result = json.loads(response_text.strip())
-                
-                # Store in history
-                self.conversation_history.append({
-                    "user": user_input,
-                    "ai": result.get("response", "")
-                })
-                
-                return result
-            
-            except json.JSONDecodeError:
-                # Fallback: simple keyword matching
-                return self._fallback_parse(user_input, response_text)
+            # Parse response
+            return self._parse_response(response.text)
         
         except Exception as e:
             self.logger.error(f"AI processing error: {e}")
-            return {
-                "action": "unknown",
-                "error": str(e),
-                "response": "Sorry, I couldn't process that command."
-            }
+            return {"response": "Sorry, I encountered an error.", "action": None}
     
-    def _fallback_parse(self, user_input: str, ai_response: str) -> Dict:
-        """Fallback command parsing using keywords."""
-        text = user_input.lower()
-        
-        # Simple keyword matching
-        if "forward" in text or "ahead" in text or "go" in text:
-            return {"action": "move_forward", "speed": 70, "response": ai_response}
-        elif "backward" in text or "back" in text or "reverse" in text:
-            return {"action": "move_backward", "speed": 70, "response": ai_response}
-        elif "left" in text:
-            return {"action": "turn_left", "speed": 50, "response": ai_response}
-        elif "right" in text:
-            return {"action": "turn_right", "speed": 50, "response": ai_response}
-        elif "stop" in text or "halt" in text:
-            return {"action": "stop", "response": ai_response}
-        else:
-            return {"action": "unknown", "response": ai_response}
+    def _create_prompt(self, text: str) -> str:
+        """Create prompt for Gemini."""
+        return f"""You are a robot assistant. Interpret this command and respond with a JSON object.
+
+Command: "{text}"
+
+Respond ONLY with valid JSON in this exact format:
+{{
+    "response": "<friendly response to user>",
+    "action": "<action name or null>",
+    "speed": <0-100 or null>,
+    "duration": <seconds or null>
+}}
+
+Valid actions: move_forward, move_backward, turn_left, turn_right, stop, null
+
+Examples:
+- "go forward" -> {{"response": "Moving forward!", "action": "move_forward", "speed": 70}}
+- "turn left" -> {{"response": "Turning left", "action": "turn_left", "speed": 50}}
+- "hello" -> {{"response": "Hello! How can I help you?", "action": null}}
+"""
     
-    async def chat_conversation(self, message: str) -> str:
-        """Have a conversation (not command-focused).
-        
-        Args:
-            message: User message
-            
-        Returns:
-            AI response
-        """
-        if not self.is_available():
-            return "AI not available"
-        
+    def _parse_response(self, text: str) -> Dict:
+        """Parse Gemini response."""
+        import json
         try:
-            response = self.chat.send_message(message)
-            response_text = response.text
-            
-            # Store in history
-            self.conversation_history.append({
-                "user": message,
-                "ai": response_text
-            })
-            
-            return response_text
+            # Extract JSON from response
+            start = text.find('{')
+            end = text.rfind('}') + 1
+            if start >= 0 and end > start:
+                json_str = text[start:end]
+                return json.loads(json_str)
+        except:
+            pass
         
-        except Exception as e:
-            self.logger.error(f"Chat error: {e}")
-            return f"Sorry, I encountered an error: {str(e)}"
+        return {"response": text, "action": None}
     
-    def get_conversation_history(self) -> List[Dict]:
-        """Get conversation history."""
-        return self.conversation_history.copy()
-    
-    def clear_history(self):
-        """Clear conversation history."""
-        self.conversation_history.clear()
-        if self.model:
-            self.chat = self.model.start_chat(history=[])
+    def _fallback_process(self, text: str) -> Dict:
+        """Simple rule-based fallback."""
+        text_lower = text.lower()
+        
+        # Movement commands
+        if any(word in text_lower for word in ['forward', 'ahead', 'front']):
+            return {"response": "Moving forward", "action": "move_forward", "speed": 70}
+        elif any(word in text_lower for word in ['backward', 'back', 'reverse']):
+            return {"response": "Moving backward", "action": "move_backward", "speed": 70}
+        elif 'left' in text_lower:
+            return {"response": "Turning left", "action": "turn_left", "speed": 50}
+        elif 'right' in text_lower:
+            return {"response": "Turning right", "action": "turn_right", "speed": 50}
+        elif 'stop' in text_lower:
+            return {"response": "Stopping", "action": "stop"}
+        else:
+            return {"response": "I didn't understand that command", "action": None}
