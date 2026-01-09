@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Qt Robot Controller - Main Entry Point
 
-Launch the robot controller application.
+Launch the robot controller application with proper asyncio integration.
 """
 
 import sys
@@ -17,6 +17,14 @@ except ImportError:
     PYQT_AVAILABLE = False
     print("❌ PyQt6 not installed. Install with: pip install PyQt6")
     sys.exit(1)
+
+try:
+    import qasync
+    QASYNC_AVAILABLE = True
+except ImportError:
+    QASYNC_AVAILABLE = False
+    print("⚠️  qasync not installed. Some features may not work.")
+    print("   Install with: pip install qasync")
 
 # Add parent to path for shared modules
 sys.path.append(str(Path(__file__).parent.parent))
@@ -65,11 +73,26 @@ def main():
     
     # Create and show main window
     try:
-        window = MainWindow()
-        window.show()
-        
-        # Run event loop
-        sys.exit(app.exec())
+        # Use qasync event loop if available
+        if QASYNC_AVAILABLE:
+            loop = qasync.QEventLoop(app)
+            asyncio.set_event_loop(loop)
+            
+            window = MainWindow()
+            window.show()
+            
+            # Run with asyncio event loop
+            with loop:
+                loop.run_forever()
+        else:
+            # Fallback: Run without async features
+            logger.warning("Running without qasync - async features disabled")
+            window = MainWindow()
+            window.show()
+            
+            # Run standard Qt event loop
+            sys.exit(app.exec())
+            
     except Exception as e:
         logger.exception(f"Fatal error: {e}")
         sys.exit(1)
