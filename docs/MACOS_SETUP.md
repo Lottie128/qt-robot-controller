@@ -1,113 +1,120 @@
-# macOS Setup Guide - Qt Robot Controller
+# Complete macOS Setup Guide
 
-Complete guide for setting up the Qt Robot Controller PC application on macOS (Intel and Apple Silicon).
+**Detailed installation and configuration guide for Qt Robot Controller on macOS**
 
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
-2. [Quick Install (Recommended)](#quick-install-recommended)
-3. [Manual Installation](#manual-installation)
-4. [Troubleshooting](#troubleshooting)
-5. [Common Issues](#common-issues)
-6. [Testing Your Installation](#testing-your-installation)
-
----
+2. [Quick Install](#quick-install)
+3. [Detailed Manual Install](#detailed-manual-install)
+4. [Post-Installation](#post-installation)
+5. [Troubleshooting](#troubleshooting)
+6. [Advanced Configuration](#advanced-configuration)
 
 ## Prerequisites
 
-### Required Software
+### System Requirements
 
-- **macOS:** 10.15 (Catalina) or later
-- **Python:** 3.9 or higher
-- **Homebrew:** Package manager for macOS
-- **Xcode Command Line Tools:** For compiling native extensions
+- **macOS Version:** 10.15 (Catalina) or newer
+- **Mac Type:** Intel or Apple Silicon (M1/M2/M3)
+- **RAM:** 4GB minimum, 8GB recommended
+- **Storage:** 2GB free space
+- **Internet:** For downloading dependencies
 
-### Check Your System
+### Pre-Installation Checklist
 
-```bash
-# Check macOS version
-sw_vers
+- [ ] Command Line Tools installed
+- [ ] Homebrew installed (or willing to install)
+- [ ] Python 3.9+ available
+- [ ] Admin/sudo access (for Homebrew)
 
-# Check Python version
-python3 --version
-
-# Check if Homebrew is installed
-brew --version
-```
-
----
-
-## Quick Install (Recommended)
-
-### One-Command Installation
+### Installing Command Line Tools
 
 ```bash
-# Clone the repository
-git clone https://github.com/Lottie128/qt-robot-controller.git
-cd qt-robot-controller
-
-# Run the macOS installer
-chmod +x scripts/macos_install.sh
-./scripts/macos_install.sh
+xcode-select --install
 ```
 
-### What the Installer Does
+Click "Install" when prompted.
 
-1. ✅ Detects your Mac type (Apple Silicon or Intel)
-2. ✅ Checks for Homebrew (prompts to install if missing)
-3. ✅ Installs PortAudio (required for microphone support)
-4. ✅ Creates Python virtual environment
-5. ✅ Installs all Python dependencies
-6. ✅ Handles Python 3.9 compatibility automatically
-7. ✅ Configures PyAudio with proper compiler flags
-8. ✅ Sets up configuration files
-9. ✅ Tests the installation
+### Installing Homebrew
 
-### After Installation
-
-```bash
-# Navigate to app directory
-cd pc_app
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Run the application
-python main.py
-```
-
----
-
-## Manual Installation
-
-If you prefer to install manually or the automated script doesn't work:
-
-### Step 1: Install Homebrew
-
-If Homebrew is not installed:
+If you don't have Homebrew:
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-**After installation, add Homebrew to your PATH:**
-
-**For Apple Silicon (M1/M2/M3):**
+**Apple Silicon Macs:** After installation, run:
 ```bash
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
-**For Intel Mac:**
+**Intel Macs:** After installation, run:
 ```bash
 echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
 eval "$(/usr/local/bin/brew shellenv)"
 ```
 
-### Step 2: Install PortAudio
+## Quick Install
+
+### One-Command Installation
 
 ```bash
-# Install PortAudio for audio support
+curl -fsSL https://raw.githubusercontent.com/Lottie128/qt-robot-controller/main/scripts/macos_install.sh | bash
+```
+
+### Or Clone First, Then Install
+
+```bash
+# Clone repository
+git clone https://github.com/Lottie128/qt-robot-controller.git
+cd qt-robot-controller
+
+# Run installer
+chmod +x scripts/macos_install.sh
+./scripts/macos_install.sh
+```
+
+The installer will:
+1. ✅ Check/install Homebrew
+2. ✅ Install PortAudio for audio support
+3. ✅ Create Python virtual environment
+4. ✅ Install all Python dependencies
+5. ✅ Handle Python 3.9 compatibility
+6. ✅ Configure audio with proper compiler flags
+7. ✅ Setup configuration files
+8. ✅ Test the installation
+
+After installation:
+```bash
+cd pc_app
+source venv/bin/activate
+python main.py
+```
+
+## Detailed Manual Install
+
+### Step 1: Setup Homebrew Environment
+
+First, ensure Homebrew is in your PATH.
+
+**For Apple Silicon (M1/M2/M3):**
+```bash
+eval "$(/opt/homebrew/bin/brew shellenv)"
+brew --version  # Verify it works
+```
+
+**For Intel Mac:**
+```bash
+eval "$(/usr/local/bin/brew shellenv)"
+brew --version  # Verify it works
+```
+
+### Step 2: Install System Dependencies
+
+```bash
+# Install PortAudio (required for microphone support)
 brew install portaudio
 
 # Verify installation
@@ -118,51 +125,93 @@ ls -la $(brew --prefix portaudio)/include/portaudio.h
 ### Step 3: Clone Repository
 
 ```bash
+# Clone to your preferred location
+cd ~/Documents/codes  # Or wherever you prefer
 git clone https://github.com/Lottie128/qt-robot-controller.git
-cd qt-robot-controller/pc_app
+cd qt-robot-controller
 ```
 
 ### Step 4: Create Virtual Environment
 
 ```bash
+cd pc_app
+
 # Create virtual environment
 python3 -m venv venv
 
 # Activate it
 source venv/bin/activate
 
-# Upgrade pip
+# Verify activation
+which python  # Should show: /path/to/pc_app/venv/bin/python
+```
+
+### Step 5: Upgrade pip
+
+```bash
 pip install --upgrade pip
 ```
 
-### Step 5: Install Python Packages
+### Step 6: Install Core Packages
 
-**Important: Use quotes around packages with brackets in zsh!**
+**Important:** Notice the quotes around packages with brackets!
 
 ```bash
-# Install core packages
-pip install PyQt6 PyQt6-WebEngine websockets "aiohttp>=3.8.0,<3.9.0" \
-    "python-socketio[client]" google-genai numpy opencv-python Pillow \
-    pyyaml python-dotenv requests colorama
+pip install PyQt6 PyQt6-WebEngine websockets \
+    "python-socketio[client]" google-genai numpy \
+    opencv-python Pillow pyyaml python-dotenv \
+    requests colorama
+```
 
+**For Python 3.9 users (check with `python --version`):**
+```bash
+pip install PyQt6 PyQt6-WebEngine websockets \
+    "aiohttp>=3.8.0,<3.9.0" "python-socketio[client]" \
+    google-genai numpy opencv-python Pillow pyyaml \
+    python-dotenv requests colorama
+```
+
+### Step 7: Install Audio Packages
+
+```bash
 # Install audio utilities
 pip install SpeechRecognition pyttsx3 edge-tts pydub
+```
 
-# Install PyAudio with PortAudio support
+### Step 8: Install PyAudio with PortAudio
+
+This is the most critical step for audio support:
+
+```bash
+# Set compiler flags and install
 CFLAGS="-I$(brew --prefix portaudio)/include" \
 LDFLAGS="-L$(brew --prefix portaudio)/lib" \
 pip install --no-cache-dir pyaudio
 ```
 
-### Step 6: Configure Application
+**If it fails, try with explicit paths:**
 
 ```bash
-# Create config directory
+# For Apple Silicon
+CFLAGS="-I/opt/homebrew/include" \
+LDFLAGS="-L/opt/homebrew/lib" \
+pip install --no-cache-dir pyaudio
+
+# For Intel
+CFLAGS="-I/usr/local/include" \
+LDFLAGS="-L/usr/local/lib" \
+pip install --no-cache-dir pyaudio
+```
+
+### Step 9: Setup Configuration
+
+```bash
+# Create directories
 mkdir -p config logs
 
 # Create .env file
 cat > config/.env << 'EOF'
-# Google Gemini API Key
+# Google Gemini API Key (optional - for AI features)
 # Get your key from: https://makersuite.google.com/app/apikey
 GEMINI_API_KEY=your_api_key_here
 
@@ -170,360 +219,319 @@ GEMINI_API_KEY=your_api_key_here
 DEBUG_MODE=false
 LOG_LEVEL=INFO
 EOF
+
+echo "✅ Configuration files created"
 ```
 
-### Step 7: Test Installation
+### Step 10: Test Installation
 
 ```bash
-# Test imports
-python -c "import PyQt6; print('✅ PyQt6')"
-python -c "import websockets; print('✅ websockets')"
-python -c "import pyaudio; print('✅ PyAudio')"
-python -c "import speech_recognition; print('✅ SpeechRecognition')"
+# Test core imports
+python -c "import PyQt6; print('✅ PyQt6 OK')"
+python -c "import websockets; print('✅ websockets OK')"
+python -c "import pyaudio; print('✅ PyAudio OK')"
+python -c "import speech_recognition; print('✅ SpeechRecognition OK')"
 
-# Run the app
+echo "
+✨ Installation complete!"
+```
+
+### Step 11: Run the Application
+
+```bash
 python main.py
 ```
 
----
+## Post-Installation
+
+### Grant Microphone Permission
+
+1. Open **System Preferences** → **Security & Privacy**
+2. Click **Privacy** tab
+3. Select **Microphone** from left sidebar
+4. Check the boxes for:
+   - Terminal (if running from terminal)
+   - Python (if it appears)
+   - Your Qt application
+
+### Add to Shell Profile (Permanent Setup)
+
+Add Homebrew to your shell profile for automatic loading:
+
+**For zsh (default on modern macOS):**
+
+```bash
+# Apple Silicon
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+
+# Intel
+echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
+
+# Reload shell
+source ~/.zprofile
+```
+
+### Create Convenient Aliases
+
+```bash
+cat >> ~/.zshrc << 'EOF'
+
+# Qt Robot Controller aliases
+alias robot-cd="cd ~/Documents/codes/qt-robot-controller/pc_app"
+alias robot-activate="cd ~/Documents/codes/qt-robot-controller/pc_app && source venv/bin/activate"
+alias robot-run="cd ~/Documents/codes/qt-robot-controller/pc_app && source venv/bin/activate && python main.py"
+EOF
+
+source ~/.zshrc
+```
+
+Now you can simply type:
+```bash
+robot-run  # Starts the app from anywhere!
+```
+
+### Configure Gemini API (Optional)
+
+For AI chat features:
+
+1. Get API key from: https://makersuite.google.com/app/apikey
+2. Edit config file:
+   ```bash
+   nano pc_app/config/.env
+   ```
+3. Replace `your_api_key_here` with your actual key
+4. Save and exit (Ctrl+X, then Y, then Enter)
 
 ## Troubleshooting
 
-### Issue 1: Homebrew Not Found
+### Issue: "zsh: command not found: brew"
 
-**Symptoms:**
-```bash
-zsh: command not found: brew
-```
+**Cause:** Homebrew not in PATH
 
 **Solution:**
-
-Add Homebrew to your PATH:
-
-**Apple Silicon:**
 ```bash
-eval "$(/opt/homebrew/bin/brew shellenv)"
-```
+# Test which Homebrew you have
+ls -la /opt/homebrew/bin/brew      # Apple Silicon
+ls -la /usr/local/bin/brew         # Intel
 
-**Intel Mac:**
-```bash
-eval "$(/usr/local/bin/brew shellenv)"
-```
+# Add the one that exists to PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"  # or /usr/local
 
-To make it permanent:
-```bash
+# Make permanent
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
 ```
 
-### Issue 2: PyAudio Installation Fails
+### Issue: "zsh: no matches found: python-socketio[client]"
 
-**Symptoms:**
+**Cause:** zsh interprets brackets as glob patterns
+
+**Solution:** Always quote packages with brackets
+```bash
+pip install "python-socketio[client]"  # ✅ Correct
 ```
-fatal error: 'portaudio.h' file not found
-```
+
+### Issue: "No matching distribution found for aiohttp>=3.9.0"
+
+**Cause:** Python 3.9 can't use latest aiohttp
 
 **Solution:**
+```bash
+pip install "aiohttp>=3.8.0,<3.9.0"
+```
 
+Check your Python version:
+```bash
+python --version
+```
+
+### Issue: "fatal error: 'portaudio.h' file not found"
+
+**Cause:** PyAudio can't find PortAudio headers
+
+**Solution:**
 ```bash
 # Install PortAudio
 brew install portaudio
 
-# Find PortAudio location
-brew --prefix portaudio
-
-# Install PyAudio with explicit paths
+# Install PyAudio with flags
 CFLAGS="-I$(brew --prefix portaudio)/include" \
 LDFLAGS="-L$(brew --prefix portaudio)/lib" \
 pip install --no-cache-dir pyaudio
 ```
 
-**Alternative (if still fails):**
-```bash
-# For Apple Silicon
-CFLAGS="-I/opt/homebrew/include" \
-LDFLAGS="-L/opt/homebrew/lib" \
-pip install --no-cache-dir pyaudio
+### Issue: Microphone Not Working
 
-# For Intel Mac
-CFLAGS="-I/usr/local/include" \
-LDFLAGS="-L/usr/local/lib" \
-pip install --no-cache-dir pyaudio
-```
+**Causes & Solutions:**
 
-### Issue 3: aiohttp Version Error
+1. **Permission not granted**
+   - System Preferences → Security & Privacy → Microphone
+   - Enable Terminal/Python
 
-**Symptoms:**
-```
-ERROR: No matching distribution found for aiohttp>=3.9.0
-```
+2. **PyAudio not installed correctly**
+   ```bash
+   pip uninstall pyaudio
+   CFLAGS="-I$(brew --prefix portaudio)/include" \
+   LDFLAGS="-L$(brew --prefix portaudio)/lib" \
+   pip install --no-cache-dir pyaudio
+   ```
 
-**Solution:**
+3. **No audio devices found**
+   ```bash
+   python << 'EOF'
+   import pyaudio
+   p = pyaudio.PyAudio()
+   print(f"Devices: {p.get_device_count()}")
+   p.terminate()
+   EOF
+   ```
 
-You're using Python 3.9. Use compatible version:
+### Issue: "ModuleNotFoundError: No module named 'PyQt6'"
 
-```bash
-pip install "aiohttp>=3.8.0,<3.9.0"
-```
-
-Or upgrade Python:
-```bash
-brew install python@3.11
-```
-
-### Issue 4: zsh Bracket Error
-
-**Symptoms:**
-```bash
-zsh: no matches found: python-socketio[client]
-```
+**Cause:** Not in virtual environment or packages not installed
 
 **Solution:**
-
-Use quotes around packages with brackets:
-
 ```bash
-# ✅ Correct
-pip install "python-socketio[client]"
-
-# ❌ Wrong
-pip install python-socketio[client]
-```
-
-### Issue 5: Microphone Permission Denied
-
-**Symptoms:**
-- Voice input doesn't work
-- "Permission denied" error when using microphone
-
-**Solution:**
-
-1. Open **System Preferences** (or **System Settings** on macOS 13+)
-2. Go to **Security & Privacy** → **Privacy**
-3. Select **Microphone** from the left sidebar
-4. Check the boxes for:
-   - **Terminal** (if running from terminal)
-   - **Python**
-   - Your application name
-
-5. Restart the application
-
-### Issue 6: "Command Not Found" for Python
-
-**Symptoms:**
-```bash
-zsh: command not found: python
-```
-
-**Solution:**
-
-macOS uses `python3` by default:
-
-```bash
-# Use python3 instead
-python3 main.py
-
-# Or create alias
-echo 'alias python=python3' >> ~/.zshrc
-source ~/.zshrc
-```
-
-### Issue 7: Qt Platform Plugin Error
-
-**Symptoms:**
-```
-qt.qpa.plugin: Could not load the Qt platform plugin
-```
-
-**Solution:**
-
-```bash
-# Reinstall PyQt6
-pip uninstall PyQt6 PyQt6-WebEngine
+cd pc_app
+source venv/bin/activate  # Make sure you're in venv
+which python              # Should show venv path
 pip install PyQt6 PyQt6-WebEngine
-
-# If still fails, install system package
-brew install pyqt@6
 ```
 
----
+### Issue: Application Won't Start
 
-## Common Issues
-
-### Virtual Environment Not Activating
+**Diagnostic steps:**
 
 ```bash
-# Make sure you're in the right directory
-cd ~/path/to/qt-robot-controller/pc_app
+# 1. Check Python version
+python --version  # Should be 3.9+
 
-# Activate venv
-source venv/bin/activate
+# 2. Check virtual environment
+echo $VIRTUAL_ENV  # Should show venv path
 
-# You should see (venv) in your prompt
+# 3. Test imports one by one
+python -c "import PyQt6; print('PyQt6 OK')"
+python -c "import websockets; print('websockets OK')"
+python -c "import aiohttp; print('aiohttp OK')"
+
+# 4. Check main.py exists
+ls -la main.py
+
+# 5. Run with verbose output
+python -v main.py
 ```
 
-### Packages Not Found After Installation
+## Advanced Configuration
+
+### Using a Different Python Version
 
 ```bash
-# Make sure venv is activated
-which python
-# Should show: .../pc_app/venv/bin/python
+# Install Python 3.11 via Homebrew
+brew install python@3.11
 
-# If not, activate venv and reinstall
+# Create venv with specific Python
+cd pc_app
+rm -rf venv
+/opt/homebrew/bin/python3.11 -m venv venv
 source venv/bin/activate
+
+# Install packages
 pip install -r requirements.txt
 ```
 
-### Application Crashes on Startup
+### Development Mode Installation
 
 ```bash
-# Check error messages
-python main.py 2>&1 | tee error.log
-
-# Test individual components
-python -c "import PyQt6; print('PyQt6 OK')"
-python -c "import websockets; print('websockets OK')"
-python -c "import pyaudio; print('PyAudio OK')"
-```
-
----
-
-## Testing Your Installation
-
-### Basic Tests
-
-```bash
+# Install with editable packages
 cd pc_app
 source venv/bin/activate
+pip install -e .
 
-# Test 1: Import all packages
-python << 'EOF'
-import PyQt6
-import websockets
-import aiohttp
-import pyaudio
-import speech_recognition
-import google.generativeai
-import cv2
-import PIL
-print("✅ All imports successful!")
-EOF
+# Install development dependencies
+pip install pytest black flake8 mypy
+```
 
-# Test 2: Check PyAudio devices
-python << 'EOF'
-import pyaudio
-p = pyaudio.PyAudio()
-print(f"Found {p.get_device_count()} audio devices")
-for i in range(p.get_device_count()):
-    info = p.get_device_info_by_index(i)
-    print(f"  {i}: {info['name']}")
-p.terminate()
-EOF
+### Multiple Environments
 
-# Test 3: Test speech recognition
-python << 'EOF'
-import speech_recognition as sr
-r = sr.Recognizer()
-print("✅ Speech recognition initialized")
-EOF
+```bash
+# Create production environment
+python3 -m venv venv-prod
+source venv-prod/bin/activate
+pip install -r requirements.txt
+deactivate
 
-# Test 4: Run the application
+# Create development environment
+python3 -m venv venv-dev
+source venv-dev/bin/activate
+pip install -r requirements.txt -r requirements-dev.txt
+deactivate
+
+# Switch between them
+source venv-prod/bin/activate  # For production
+source venv-dev/bin/activate   # For development
+```
+
+### Performance Tuning
+
+```bash
+# Install performance packages
+pip install cython numpy --upgrade
+
+# Use faster JSON library
+pip install ujson
+
+# Enable JIT compilation
+export PYTHONOPTIMIZE=1
 python main.py
 ```
 
-### Full System Test
+## Verification Checklist
 
-1. **Launch Application**
-   ```bash
-   python main.py
-   ```
+Before reporting issues, verify:
 
-2. **Test Connection Dialog**
-   - Should see connection dialog
-   - Try entering a dummy IP (e.g., 192.168.1.100)
-
-3. **Test Voice (if connected to robot)**
-   - Click microphone button
-   - Grant permission if prompted
-   - Speak a test command
-
-4. **Check Logs**
-   ```bash
-   tail -f logs/app.log
-   ```
-
----
-
-## Performance Optimization
-
-### For Apple Silicon (M1/M2/M3)
-
-Some packages may have ARM-optimized versions:
-
-```bash
-# Install ARM-native packages when available
-brew install python@3.11
-
-# Create venv with native Python
-/opt/homebrew/bin/python3.11 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-### Enable GPU Acceleration (Optional)
-
-For AI features:
-
-```bash
-# Install Metal Performance Shaders support
-pip install tensorflow-metal
-```
-
----
-
-## Uninstallation
-
-### Remove Application
-
-```bash
-# Remove repository
-rm -rf ~/path/to/qt-robot-controller
-
-# Optional: Remove Homebrew packages
-brew uninstall portaudio
-```
-
-### Keep Homebrew
-
-If you want to keep Homebrew for other uses, just remove PortAudio:
-
-```bash
-brew uninstall portaudio
-```
-
----
-
-## Additional Resources
-
-- [Homebrew Documentation](https://docs.brew.sh/)
-- [PyQt6 Documentation](https://doc.qt.io/qtforpython/)
-- [Python Virtual Environments](https://docs.python.org/3/tutorial/venv.html)
-- [macOS Terminal Guide](https://support.apple.com/guide/terminal/welcome/mac)
-
----
+- [ ] Homebrew installed and in PATH
+- [ ] PortAudio installed (`brew list portaudio`)
+- [ ] Virtual environment activated (`which python`)
+- [ ] All packages installed (`pip list`)
+- [ ] PyAudio imports successfully
+- [ ] Microphone permission granted
+- [ ] Config files exist (`ls config/.env`)
+- [ ] Running from correct directory (`pwd`)
 
 ## Getting Help
 
-If you're still having issues:
+### Collect System Information
 
-1. Check the [main troubleshooting guide](TROUBLESHOOTING.md)
-2. Search [existing issues](https://github.com/Lottie128/qt-robot-controller/issues)
-3. Open a [new issue](https://github.com/Lottie128/qt-robot-controller/issues/new) with:
-   - macOS version (`sw_vers`)
-   - Python version (`python3 --version`)
-   - Error messages
-   - Steps to reproduce
+```bash
+# Create debug info
+cat > debug_info.txt << EOF
+macOS Version: $(sw_vers -productVersion)
+Mac Type: $(uname -m)
+Homebrew: $(brew --version | head -1)
+Python: $(python --version)
+Pip: $(pip --version)
+Virtual Env: $VIRTUAL_ENV
+PortAudio: $(brew list portaudio 2>&1 | head -1)
+PyAudio: $(pip show pyaudio | grep Version)
+PyQt6: $(pip show PyQt6 | grep Version)
+EOF
+
+cat debug_info.txt
+```
+
+### Where to Get Help
+
+- **GitHub Issues:** [Report bugs](https://github.com/Lottie128/qt-robot-controller/issues)
+- **Discussions:** [Ask questions](https://github.com/Lottie128/qt-robot-controller/discussions)
+- **Quick Reference:** [MACOS_QUICKREF.md](MACOS_QUICKREF.md)
+
+## Next Steps
+
+1. 🚀 [Connect to your Raspberry Pi](../README.md#step-3-connect--control)
+2. 🎮 [Learn keyboard controls](CONTROLS.md)
+3. ⚙️ [Configure GPIO pins](GPIO_CONFIGURATION.md)
+4. 🤖 [Setup AI features](AI_SETUP.md)
 
 ---
 
 **Last Updated:** January 2026  
-**macOS Versions Tested:** 10.15 (Catalina) through 14.x (Sonoma)
+**Tested On:** macOS Sonoma 14.x, Apple Silicon & Intel Macs
